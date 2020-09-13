@@ -1,3 +1,7 @@
+import os
+import tidalapi
+
+
 def main():
     tidal_url = input('Enter TIDAL playlist URL: ')
     print(tidal_url)
