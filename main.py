@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qs
 
 import requests
 import tidalapi
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv, get_key, set_key, unset_key
 
 # Loads environment variables defined in .env
 load_dotenv()
@@ -16,15 +16,27 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 REDIRECT_URI = os.getenv('REDIRECT_URI')
 STATE = os.getenv('STATE')
+REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')
+
+ACCESS_TOKEN = ''
 
 
 def print_hdiv():
-    print('----------')
+    print('-----------------------------------')
+
+
+def refresh_token():
 
 
 def auth_spotify():
+    # If REFRESH_TOKEN exists, user wanted to be remembered from last session, so refresh access token
+    print('Recognizing Spotify user...')
+    if REFRESH_TOKEN:
+        print('User is recognized. Refreshing Spotify access token...')
+        refresh_token()
+
     # Request user authentication
-    print('Connecting to Spotify...')
+    print('User is unrecognized. Requesting Spotify authorization code...')
     code_response = requests.get('https://accounts.spotify.com/authorize',
                                  params={'client_id': CLIENT_ID,
                                          'response_type': 'code',
@@ -55,13 +67,29 @@ def auth_spotify():
         print('Exchanging authorization code for access token...')
 
     # Exchange authorization code for access token
-    token_response = requests.post('https://accounts.spotify.com/api/token',
+    token = requests.post('https://accounts.spotify.com/api/token',
                                    data={'grant_type': 'authorization_code',
                                          'code': qs.get('code'),
                                          'redirect_uri': REDIRECT_URI,
                                          'client_id': CLIENT_ID,
-                                         'client_secret': CLIENT_SECRET})
-    print(token_response)
+                                         'client_secret': CLIENT_SECRET}).json()
+
+    global ACCESS_TOKEN
+    ACCESS_TOKEN = token['access_token']
+
+    # Ask user if they would like to be remembered for next session
+    while True:
+        remember_me = input('Would you like your Spotify access information to be remembered next session (y/n)? ')
+        # If yes, save the refresh token to environment variables
+        if remember_me.lower() == 'y':
+            set_key(find_dotenv(), 'REFRESH_TOKEN', token['refresh_token'])
+            break
+        # If no, make sure refresh token is unset in environment variables
+        elif remember_me.lower() == 'n':
+            unset_key(find_dotenv(), 'REFRESH_TOKEN')
+            break
+        else:
+            pass
 
 
 def main():
@@ -72,7 +100,7 @@ def main():
     if session.check_login():
         print(f'Successfully logged in as {TIDAL_EMAIL}')
 
-    # Authenticate Spotify
+    # Authenticate Spotify and get access token
     auth_spotify()
 
     print_hdiv()
