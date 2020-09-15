@@ -5,7 +5,7 @@ from urllib.parse import urlparse, parse_qs
 
 import requests
 import tidalapi
-from dotenv import load_dotenv, find_dotenv, get_key, set_key, unset_key
+from dotenv import load_dotenv, find_dotenv, set_key, unset_key
 
 # Loads environment variables defined in .env
 load_dotenv()
@@ -73,7 +73,6 @@ def request_token():
                                 'redirect_uri': REDIRECT_URI,
                                 'client_id': CLIENT_ID,
                                 'client_secret': CLIENT_SECRET}).json()
-
     return token
 
 
@@ -89,8 +88,6 @@ def auth_spotify():
 
     global ACCESS_TOKEN
     ACCESS_TOKEN = token['access_token']
-
-    exit()
 
     # Ask user if they would like to be remembered for next session
     while True:
