@@ -14,6 +14,7 @@ TIDAL_EMAIL = os.getenv('TIDAL_EMAIL')
 TIDAL_PASS = os.getenv('TIDAL_PASS')
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+STATE = os.getenv('STATE')
 
 
 def print_hdiv():
@@ -26,7 +27,7 @@ def request_spotify_auth():
     params = {'client_id': CLIENT_ID,
               'response_type': 'code',
               'redirect_uri': 'https://example.com/callback',
-              'state': 'AUIdherfheh4ffDo8seFef4uwyIrq',
+              'state': STATE,
               'scope': 'playlist-modify-public playlist-modify-private'
               }
     response = requests.get('https://accounts.spotify.com/authorize', params)
