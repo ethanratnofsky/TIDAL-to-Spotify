@@ -21,28 +21,34 @@ def print_hdiv():
 
 
 def request_spotify_auth():
+    # Request user authentication
     print('Connecting to Spotify...')
-    response = requests.get('https://accounts.spotify.com/authorize',
-                            params={
-                                'client_id': CLIENT_ID,
-                                'response_type': 'code',
-                                'redirect_uri': 'https://example.com/callback',
-                                'state': 'AUIdherfheh4ffDo8seFef4uwyIrq',
-                                'scope': 'playlist-modify-public playlist-modify-private'
-                            })
+    params = {'client_id': CLIENT_ID,
+              'response_type': 'code',
+              'redirect_uri': 'https://example.com/callback',
+              'state': 'AUIdherfheh4ffDo8seFef4uwyIrq',
+              'scope': 'playlist-modify-public playlist-modify-private'
+              }
+    response = requests.get('https://accounts.spotify.com/authorize', params)
+
+    # Print next step information for user
     print_hdiv()
-    print('''You will be redirected to a web page in 5 seconds to grant us access to your Spotify user information.
-    This information is necessary for us to be able to create Spotify playlists on your account for you. Please be
-    ready to copy and paste the URL of the web page you are redirected to after you grant us access.''')
+    print('You will be redirected to a web page in 5 seconds to grant us access to your Spotify user data...\n'
+          '\n'
+          'This information is necessary for us to be able to create Spotify playlists on your account for you.\n'
+          'Please be ready to copy and paste the URL of the web page you are redirected to after you grant us access.')
     print_hdiv()
     time.sleep(5)
+
+    # Get authorization code that can be exchanged for an access token
     webbrowser.open(response.url)
     redirect_url = input('Please copy and paste the URL of the website you were redirected to: ')
     url_object = urlparse(redirect_url)
     qs = parse_qs(url_object.query)
 
+    # Error if user does not grant access to Spotify user data
     if qs.get('error'):
-        print('Uh oh! Our request to access your user information was denied!')
+        print('Oh no! Our request to access your user data was denied!')
     else:
         print('We\'re in!')
 
@@ -53,7 +59,7 @@ def main():
     session = tidalapi.Session()
     session.login(TIDAL_EMAIL, TIDAL_PASS)
     if session.check_login():
-        print(f"Successfully logged in as {TIDAL_EMAIL}")
+        print(f'Successfully logged in as {TIDAL_EMAIL}')
 
     # Authenticate Spotify
     request_spotify_auth()
