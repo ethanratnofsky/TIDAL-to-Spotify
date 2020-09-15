@@ -1,8 +1,10 @@
 import os
+import time
+import webbrowser
+from urllib.parse import urlparse, parse_qs
+
 import requests
 import tidalapi
-import webbrowser
-
 from dotenv import load_dotenv
 
 # Loads environment variables defined in .env
@@ -19,6 +21,7 @@ def print_hdiv():
 
 
 def request_spotify_auth():
+    print('Connecting to Spotify...')
     response = requests.get('https://accounts.spotify.com/authorize',
                             params={
                                 'client_id': CLIENT_ID,
@@ -27,8 +30,21 @@ def request_spotify_auth():
                                 'state': 'AUIdherfheh4ffDo8seFef4uwyIrq',
                                 'scope': 'playlist-modify-public playlist-modify-private'
                             })
+    print_hdiv()
+    print('''You will be redirected to a web page in 5 seconds to grant us access to your Spotify user information.
+    This information is necessary for us to be able to create Spotify playlists on your account for you. Please be
+    ready to copy and paste the URL of the web page you are redirected to after you grant us access.''')
+    print_hdiv()
+    time.sleep(5)
     webbrowser.open(response.url)
-    print(response.text)
+    redirect_url = input('Please copy and paste the URL of the website you were redirected to: ')
+    url_object = urlparse(redirect_url)
+    qs = parse_qs(url_object.query)
+
+    if qs.get('error'):
+        print('Uh oh! Our request to access your user information was denied!')
+    else:
+        print('We\'re in!')
 
 
 def main():
@@ -38,7 +54,13 @@ def main():
     session.login(TIDAL_EMAIL, TIDAL_PASS)
     if session.check_login():
         print(f"Successfully logged in as {TIDAL_EMAIL}")
-        print_hdiv()
+
+    # Authenticate Spotify
+    request_spotify_auth()
+
+    print_hdiv()
+    print('Ready to do work!')
+    exit()
 
     # Queries user for valid TIDAL playlist URL
     while True:
@@ -51,8 +73,6 @@ def main():
         except requests.exceptions.HTTPError:
             print('Invalid TIDAL playlist URL.')
 
-    request_spotify_auth()
-
 
 if __name__ == '__main__':
-    request_spotify_auth()
+    main()
