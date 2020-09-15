@@ -21,7 +21,7 @@ def print_hdiv():
     print('----------')
 
 
-def request_spotify_auth():
+def auth_spotify():
     # Request user authentication
     print('Connecting to Spotify...')
     params = {'client_id': CLIENT_ID,
@@ -30,7 +30,7 @@ def request_spotify_auth():
               'state': STATE,
               'scope': 'playlist-modify-public playlist-modify-private'
               }
-    response = requests.get('https://accounts.spotify.com/authorize', params)
+    code_response = requests.get('https://accounts.spotify.com/authorize', params)
 
     # Print next step information for user
     print_hdiv()
@@ -42,7 +42,7 @@ def request_spotify_auth():
     time.sleep(5)
 
     # Get authorization code that can be exchanged for an access token
-    webbrowser.open(response.url)
+    webbrowser.open(code_response.url)
     redirect_url = input('Please copy and paste the URL of the website you were redirected to: ')
     url_object = urlparse(redirect_url)
     qs = parse_qs(url_object.query)
@@ -63,7 +63,7 @@ def main():
         print(f'Successfully logged in as {TIDAL_EMAIL}')
 
     # Authenticate Spotify
-    request_spotify_auth()
+    auth_spotify()
 
     print_hdiv()
     print('Ready to do work!')
