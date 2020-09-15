@@ -26,17 +26,17 @@ def print_hdiv():
 
 
 def refresh_token():
+    # Refresh access token
+    token = requests.post('https://accounts.spotify.com/api/token',
+                          data={'grant_type': 'refresh_token',
+                                'refresh_token': REFRESH_TOKEN,
+                                'client_id': CLIENT_ID,
+                                'client_secret': CLIENT_SECRET}).json()
+    return token
 
 
-def auth_spotify():
-    # If REFRESH_TOKEN exists, user wanted to be remembered from last session, so refresh access token
-    print('Recognizing Spotify user...')
-    if REFRESH_TOKEN:
-        print('User is recognized. Refreshing Spotify access token...')
-        refresh_token()
-
+def request_token():
     # Request user authentication
-    print('User is unrecognized. Requesting Spotify authorization code...')
     code_response = requests.get('https://accounts.spotify.com/authorize',
                                  params={'client_id': CLIENT_ID,
                                          'response_type': 'code',
@@ -68,14 +68,29 @@ def auth_spotify():
 
     # Exchange authorization code for access token
     token = requests.post('https://accounts.spotify.com/api/token',
-                                   data={'grant_type': 'authorization_code',
-                                         'code': qs.get('code'),
-                                         'redirect_uri': REDIRECT_URI,
-                                         'client_id': CLIENT_ID,
-                                         'client_secret': CLIENT_SECRET}).json()
+                          data={'grant_type': 'authorization_code',
+                                'code': qs.get('code'),
+                                'redirect_uri': REDIRECT_URI,
+                                'client_id': CLIENT_ID,
+                                'client_secret': CLIENT_SECRET}).json()
+
+    return token
+
+
+def auth_spotify():
+    # If REFRESH_TOKEN exists, user wanted to be remembered from last session, so refresh access token
+    print('Recognizing Spotify user...')
+    if REFRESH_TOKEN:
+        print('User is recognized. Refreshing Spotify access token...')
+        token = refresh_token()
+    else:
+        print('User is unrecognized. Requesting Spotify authorization code...')
+        token = request_token()
 
     global ACCESS_TOKEN
     ACCESS_TOKEN = token['access_token']
+
+    exit()
 
     # Ask user if they would like to be remembered for next session
     while True:
