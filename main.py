@@ -90,18 +90,29 @@ def auth_spotify():
     ACCESS_TOKEN = token['access_token']
 
     # Ask user if they would like to be remembered for next session
+    print_hdiv()
     while True:
         remember_me = input('Would you like your Spotify access information to be remembered next session (y/n)? ')
         # If yes, save the refresh token to environment variables
         if remember_me.lower() == 'y':
-            set_key(find_dotenv(), 'REFRESH_TOKEN', token['refresh_token'])
+            try:
+                print("We'll remember you next time! ;)")
+                set_key(find_dotenv(), 'REFRESH_TOKEN', token['refresh_token'])
+            except KeyError:
+                pass
             break
         # If no, make sure refresh token is unset in environment variables
         elif remember_me.lower() == 'n':
+            print('Erasing you from memory...bye! :(')
             unset_key(find_dotenv(), 'REFRESH_TOKEN')
             break
         else:
             pass
+    print_hdiv()
+
+    user_object = requests.get('https://api.spotify.com/v1/me',
+                               headers={'Authorization': 'Bearer ' + ACCESS_TOKEN}).json()
+    print(f"Successfully logged into Spotify as {user_object['id']}")
 
 
 def main():
@@ -110,25 +121,22 @@ def main():
     session = tidalapi.Session()
     session.login(TIDAL_EMAIL, TIDAL_PASS)
     if session.check_login():
-        print(f'Successfully logged in as {TIDAL_EMAIL}')
+        print(f'Successfully logged into TIDAL as {TIDAL_EMAIL}')
 
     # Authenticate Spotify and get access token
     auth_spotify()
 
-    print_hdiv()
-    print('Ready to do work!')
-    exit()
-
     # Queries user for valid TIDAL playlist URL
+    print_hdiv()
     while True:
         tidal_url = input('Enter TIDAL playlist URL: ')
         tidal_playlist_id = tidal_url[34:]
         try:
             tidal_playlist = session.get_playlist(tidal_playlist_id)
-            print_hdiv()
             break
         except requests.exceptions.HTTPError:
             print('Invalid TIDAL playlist URL.')
+    print_hdiv()
 
 
 if __name__ == '__main__':
