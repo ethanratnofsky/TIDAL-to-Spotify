@@ -1,6 +1,7 @@
 import os
 import time
 import webbrowser
+from base64 import b64encode
 from urllib.parse import urlparse, parse_qs
 
 import requests
@@ -14,6 +15,7 @@ TIDAL_EMAIL = os.getenv('TIDAL_EMAIL')
 TIDAL_PASS = os.getenv('TIDAL_PASS')
 CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+REDIRECT_URI = os.getenv('REDIRECT_URI')
 STATE = os.getenv('STATE')
 
 
@@ -24,13 +26,13 @@ def print_hdiv():
 def auth_spotify():
     # Request user authentication
     print('Connecting to Spotify...')
-    params = {'client_id': CLIENT_ID,
-              'response_type': 'code',
-              'redirect_uri': 'https://example.com/callback',
-              'state': STATE,
-              'scope': 'playlist-modify-public playlist-modify-private'
-              }
-    code_response = requests.get('https://accounts.spotify.com/authorize', params)
+    code_response = requests.get('https://accounts.spotify.com/authorize',
+                                 params={'client_id': CLIENT_ID,
+                                         'response_type': 'code',
+                                         'redirect_uri': REDIRECT_URI,
+                                         'state': STATE,
+                                         'scope': 'playlist-modify-public playlist-modify-private'
+                                         })
 
     # Print next step information for user
     print_hdiv()
@@ -51,7 +53,18 @@ def auth_spotify():
     if qs.get('error'):
         print('Oh no! Our request to access your user data was denied!')
     else:
-        print('We\'re in!')
+        print('Exchanging authorization code for access token...')
+
+    # Exchange authorization code for access token
+    headers = {
+        'Authentication': 'Basic ' + b64encode((CLIENT_ID + ':' + CLIENT_SECRET).encode('ascii')).decode('ascii')}
+    print(headers)
+    token_response = requests.post('https://accounts.spotify.com/api/token',
+                                   headers=headers,
+                                   data={'grant_type': 'authorization_code',
+                                         'code': qs.get('code'),
+                                         'redirect_uri': REDIRECT_URI})
+    print(token_response)
 
 
 def main():
