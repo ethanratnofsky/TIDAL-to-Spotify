@@ -1,7 +1,6 @@
 import os
 import time
 import webbrowser
-from base64 import b64encode
 from urllib.parse import urlparse, parse_qs
 
 import requests
@@ -56,14 +55,12 @@ def auth_spotify():
         print('Exchanging authorization code for access token...')
 
     # Exchange authorization code for access token
-    headers = {
-        'Authentication': 'Basic ' + b64encode((CLIENT_ID + ':' + CLIENT_SECRET).encode('ascii')).decode('ascii')}
-    print(headers)
     token_response = requests.post('https://accounts.spotify.com/api/token',
-                                   headers=headers,
                                    data={'grant_type': 'authorization_code',
                                          'code': qs.get('code'),
-                                         'redirect_uri': REDIRECT_URI})
+                                         'redirect_uri': REDIRECT_URI,
+                                         'client_id': CLIENT_ID,
+                                         'client_secret': CLIENT_SECRET})
     print(token_response)
 
 
