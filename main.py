@@ -18,7 +18,7 @@ REDIRECT_URI = os.getenv('REDIRECT_URI')
 STATE = os.getenv('STATE')
 REFRESH_TOKEN = os.getenv('REFRESH_TOKEN')
 
-ACCESS_TOKEN = ''
+access_token = ''
 
 
 def print_hdiv():
@@ -86,8 +86,8 @@ def auth_spotify():
         print('User is unrecognized. Requesting Spotify authorization code...')
         token = request_token()
 
-    global ACCESS_TOKEN
-    ACCESS_TOKEN = token['access_token']
+    global access_token
+    access_token = token['access_token']
 
     # Ask user if they would like to be remembered for next session
     print_hdiv()
@@ -111,7 +111,7 @@ def auth_spotify():
     print_hdiv()
 
     user_object = requests.get('https://api.spotify.com/v1/me',
-                               headers={'Authorization': 'Bearer ' + ACCESS_TOKEN}).json()
+                               headers={'Authorization': 'Bearer ' + access_token}).json()
     print(f"Successfully logged into Spotify as {user_object['id']}")
 
 
