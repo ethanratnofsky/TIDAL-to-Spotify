@@ -50,13 +50,14 @@ def request_token():
     print('You will be redirected to a web page in 5 seconds to grant us access to your Spotify user data...\n'
           '\n'
           'This information is necessary for us to be able to create Spotify playlists on your account for you.\n'
-          'Please be ready to copy and paste the URL of the web page you are redirected to after you grant us access.')
-    print_hdiv()
+          'Please be ready to copy and paste the URL of the web page you are redirected to after you grant us access.\n')
     time.sleep(5)
 
     # Get authorization code that can be exchanged for an access token
     webbrowser.open(code_response.url)
     redirect_url = input('Please copy and paste the URL of the website you were redirected to: ')
+    # TODO: Error handling for pasted URL
+    print_hdiv()
     url_object = urlparse(redirect_url)
     qs = parse_qs(url_object.query)
 
@@ -137,6 +138,24 @@ def main():
         except requests.exceptions.HTTPError:
             print('Invalid TIDAL playlist URL.')
     print_hdiv()
+
+    # TODO: Print TIDAL playlist information
+
+    # TODO: Ask user if they would like to create a Spotify playlist under the same name
+
+    # TODO: Check if user already has a Spotify playlist under the inputted playlist name
+    # TODO: Ask if user would like to overwrite that playlist if it already exists.
+    # TODO: If so, remove all tracks from playlist and skip create playlist step.
+    # TODO: If not, ask for different playlist name.
+
+    # TODO: Create new Spotify playlist as inputted name.
+
+    # TODO: Iterate through TIDAL playlist tracks.
+    # TODO: For each track, search Spotify for track title and artist.
+    # TODO: If Spotify track found, add to new playlist. If not, add TIDAL track to tracks_not_added.
+
+    # TODO: Print completed status with number of tracks added and contents of tracks_not_added
+    # TODO: Open web browser to Spotify playlist
 
 
 if __name__ == '__main__':
