@@ -215,7 +215,7 @@ def main():
     # TODO: If Spotify track found, add to new playlist. If not, add TIDAL track to tracks_not_added.
 
     # TODO: Print completed status with number of tracks added and contents of tracks_not_added
-    # TODO: Open web browser to Spotify playlist
+    # Open Spotify playlist in web browser
     webbrowser.open(spotify_playlist['external_urls']['spotify'])
 
 
