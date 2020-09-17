@@ -2,7 +2,7 @@ import json
 import os
 import time
 import webbrowser
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, quote
 
 import requests
 import tidalapi
@@ -142,6 +142,19 @@ def get_users_spotify_playlists():
     return playlists
 
 
+def search_spotify(query):
+    results = requests.get('https://api.spotify.com/v1/search',
+                           headers={
+                               'Authorization': 'Bearer ' + access_token
+                           },
+                           params={
+                               'q': quote(query),
+                               'type': 'track',
+                               'limit': 1
+                           }).json()
+    return results['tracks']['items']
+
+
 def main():
     # Initialize TIDAL session using credentials defined in .env
     print('Logging into TIDAL session...')
@@ -196,27 +209,34 @@ def main():
             i += 1
 
     # Create new Spotify playlist as inputted name.
-    print(f'Creating a new Spotify playlist named \'{spotify_playlist_name}\'...')
-    payload = {
-        'name': spotify_playlist_name,
-        'public': True,
-        'collaborative': False,
-        'description': tidal_playlist.description
-    }
-    spotify_playlist = requests.post(f'https://api.spotify.com/v1/users/{spotify_user_id}/playlists',
-                                     headers={
-                                         'Authorization': 'Bearer ' + access_token,
-                                         'Content-Type': 'application/json'
-                                     },
-                                     data=json.dumps(payload)).json()
+    # print(f'Creating a new Spotify playlist named \'{spotify_playlist_name}\'...')
+    # payload = {
+    #     'name': spotify_playlist_name,
+    #     'public': True,
+    #     'collaborative': False,
+    #     'description': tidal_playlist.description
+    # }
+    # spotify_playlist = requests.post(f'https://api.spotify.com/v1/users/{spotify_user_id}/playlists',
+    #                                  headers={
+    #                                      'Authorization': 'Bearer ' + access_token,
+    #                                      'Content-Type': 'application/json'
+    #                                  },
+    #                                  data=json.dumps(payload)).json()
 
     # TODO: Iterate through TIDAL playlist tracks.
     # TODO: For each track, search Spotify for track title and artist.
-    # TODO: If Spotify track found, add to new playlist. If not, add TIDAL track to tracks_not_added.
+    # TODO: If Spotify track found, add Spotify URI to spotify_uris. If not, add TIDAL track to tracks_not_added.
+    for item in tidal_playlist_items:
+        try:
+            print(search_spotify(item.name)[0]['name'])
+        except IndexError:
+            print('NO RESULTS')
+
+    # TODO: Add Spotify tracks from spotify_uris to Spotify playlist
 
     # TODO: Print completed status with number of tracks added and contents of tracks_not_added
     # Open Spotify playlist in web browser
-    webbrowser.open(spotify_playlist['external_urls']['spotify'])
+    # webbrowser.open(spotify_playlist['external_urls']['spotify'])
 
 
 if __name__ == '__main__':
