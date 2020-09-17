@@ -131,6 +131,16 @@ def print_tidal_playlist(playlist, items):
         print('    ' + item.name, '-', item.artist.name)
 
 
+def get_users_spotify_playlists():
+    spotify_playlists = requests.get('https://api.spotify.com/v1/me/playlists',
+                                     headers={'Authorization': 'Bearer ' + access_token}).json()
+    playlists = []
+    for playlist in spotify_playlists['items']:
+        playlists.append(playlist['name'])
+
+    return playlists
+
+
 def main():
     # Initialize TIDAL session using credentials defined in .env
     print('Logging into TIDAL session...')
@@ -163,23 +173,28 @@ def main():
 
     # Ask user if they would like to create a Spotify playlist under the same name
     while True:
-        same_name = input(f'Would you like create the Spotify playlist under the same TIDAL playlist name,\
-         {tidal_playlist.name} (y/n)? ')
+        same_name = input(
+            f'Would you like create the Spotify playlist under the same TIDAL playlist name \'{tidal_playlist.name}\' (y/n)? ')
         if same_name.lower() == 'y':
             spotify_playlist_name = tidal_playlist.name
             break
         elif same_name.lower() == 'n':
             spotify_playlist_name = input('Enter your desired new Spotify playlist name: ')
             break
-        else:
-            pass
 
-    # TODO: Check if user already has a Spotify playlist under the inputted playlist name
-    # TODO: Ask if user would like to overwrite that playlist if it already exists.
-    # TODO: If so, remove all tracks from playlist and skip create playlist step.
-    # TODO: If not, ask for different playlist name.
+    # Check if user already has a Spotify playlist under the inputted playlist name
+    spotify_playlists = get_users_spotify_playlists()
+    i = 0
+    while i < len(spotify_playlists):
+        if spotify_playlist_name == spotify_playlists[i]:
+            print(f'A Spotify playlist named \'{spotify_playlist_name}\' already exists under your user!')
+            spotify_playlist_name = input('Please enter a playlist name that does not already exist: ')
+            i = 0
+        else:
+            i += 1
 
     # TODO: Create new Spotify playlist as inputted name.
+    print(f'Creating a new Spotify playlist named \'{spotify_playlist_name}\'...')
 
     # TODO: Iterate through TIDAL playlist tracks.
     # TODO: For each track, search Spotify for track title and artist.
