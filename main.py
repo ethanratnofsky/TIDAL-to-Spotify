@@ -113,7 +113,7 @@ def auth_spotify():
 
     user_object = requests.get('https://api.spotify.com/v1/me',
                                headers={'Authorization': 'Bearer ' + access_token}).json()
-    print(f"Successfully logged into Spotify as {user_object['id']}")
+    return user_object['id']
 
 
 def print_tidal_playlist(playlist, items):
@@ -153,7 +153,8 @@ def main():
         exit()
 
     # Authenticate Spotify and get access token
-    auth_spotify()
+    spotify_user_id = auth_spotify()
+    print(f"Successfully logged into Spotify as {spotify_user_id}")
 
     # Queries user for valid TIDAL playlist URL
     print_hdiv()
