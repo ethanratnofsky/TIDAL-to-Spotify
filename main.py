@@ -1,3 +1,4 @@
+import json
 import os
 import time
 import webbrowser
@@ -194,8 +195,20 @@ def main():
         else:
             i += 1
 
-    # TODO: Create new Spotify playlist as inputted name.
+    # Create new Spotify playlist as inputted name.
     print(f'Creating a new Spotify playlist named \'{spotify_playlist_name}\'...')
+    payload = {
+        'name': spotify_playlist_name,
+        'public': True,
+        'collaborative': False,
+        'description': tidal_playlist.description
+    }
+    spotify_playlist = requests.post(f'https://api.spotify.com/v1/users/{spotify_user_id}/playlists',
+                                     headers={
+                                         'Authorization': 'Bearer ' + access_token,
+                                         'Content-Type': 'application/json'
+                                     },
+                                     data=json.dumps(payload)).json()
 
     # TODO: Iterate through TIDAL playlist tracks.
     # TODO: For each track, search Spotify for track title and artist.
@@ -203,6 +216,7 @@ def main():
 
     # TODO: Print completed status with number of tracks added and contents of tracks_not_added
     # TODO: Open web browser to Spotify playlist
+    webbrowser.open(spotify_playlist['external_urls']['spotify'])
 
 
 if __name__ == '__main__':
