@@ -2,7 +2,7 @@ import json
 import os
 import time
 import webbrowser
-from urllib.parse import urlparse, parse_qs, quote
+from urllib.parse import urlparse, parse_qs, quote_plus
 
 import requests
 import tidalapi
@@ -148,7 +148,8 @@ def search_spotify(query):
                                'Authorization': 'Bearer ' + access_token
                            },
                            params={
-                               'q': quote(query),
+                               # TODO: urllib is not handling special characters well when encoding strings
+                               'q': quote_plus(query),
                                'type': 'track',
                                'limit': 1
                            }).json()
@@ -228,9 +229,10 @@ def main():
     # TODO: If Spotify track found, add Spotify URI to spotify_uris. If not, add TIDAL track to tracks_not_added.
     for item in tidal_playlist_items:
         try:
-            print(search_spotify(item.name)[0]['name'])
+            results = search_spotify(item.name + ' ' + item.artist.name)
+            print(item.name + ' by ' + item.artist.name, '--->', results[0]['name'] + ' by ' + results[0]['artists'][0]['name'])
         except IndexError:
-            print('NO RESULTS')
+            print(item.name + ' by ' + item.artist.name, '---> NO RESULTS')
 
     # TODO: Add Spotify tracks from spotify_uris to Spotify playlist
 
