@@ -116,6 +116,21 @@ def auth_spotify():
     print(f"Successfully logged into Spotify as {user_object['id']}")
 
 
+def print_tidal_playlist(playlist, items):
+    print('Playlist ID:', playlist.id)
+    print('Title:', playlist.name)
+    print('Description:', playlist.description)
+    print('Date Created:', playlist.created)
+    print('Creator:', playlist.creator)
+    print('Duration:', playlist.duration)
+    print('Public?:', playlist.is_public)
+    print('Date Last Modified:', playlist.last_updated)
+    print('Number of Tracks:', playlist.num_tracks)
+    print('Contents:')
+    for item in items:
+        print('    ' + item.name, '-', item.artist.name)
+
+
 def main():
     # Initialize TIDAL session using credentials defined in .env
     print('Logging into TIDAL session...')
@@ -123,6 +138,9 @@ def main():
     session.login(TIDAL_EMAIL, TIDAL_PASS)
     if session.check_login():
         print(f'Successfully logged into TIDAL as {TIDAL_EMAIL}')
+    else:
+        print('Uh oh! Error logging in to TIDAL.')
+        exit()
 
     # Authenticate Spotify and get access token
     auth_spotify()
@@ -134,14 +152,27 @@ def main():
         tidal_playlist_id = tidal_url[34:]
         try:
             tidal_playlist = session.get_playlist(tidal_playlist_id)
+            tidal_playlist_items = session.get_playlist_items(tidal_playlist_id)
             break
         except requests.exceptions.HTTPError:
             print('Invalid TIDAL playlist URL.')
+
+    print('TIDAL Playlist Information:')
+    print_tidal_playlist(tidal_playlist, tidal_playlist_items)
     print_hdiv()
 
-    # TODO: Print TIDAL playlist information
-
-    # TODO: Ask user if they would like to create a Spotify playlist under the same name
+    # Ask user if they would like to create a Spotify playlist under the same name
+    while True:
+        same_name = input(f'Would you like create the Spotify playlist under the same TIDAL playlist name,\
+         {tidal_playlist.name} (y/n)? ')
+        if same_name.lower() == 'y':
+            spotify_playlist_name = tidal_playlist.name
+            break
+        elif same_name.lower() == 'n':
+            spotify_playlist_name = input('Enter your desired new Spotify playlist name: ')
+            break
+        else:
+            pass
 
     # TODO: Check if user already has a Spotify playlist under the inputted playlist name
     # TODO: Ask if user would like to overwrite that playlist if it already exists.
