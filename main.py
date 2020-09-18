@@ -224,8 +224,10 @@ def main():
                                          'Content-Type': 'application/json'
                                      },
                                      data=json.dumps(payload)).json()
+    print(f'Successfully created Spotify playlist \'{spotify_playlist_name}\'')
 
-    # Iterate through TIDAL playlist tracks. For each track, search Spotify for track title and artist.
+    # Search Spotify for tracks in TIDAL playlist
+    print('Adding tracks from TIDAL playlist to Spotify playlist...')
     spotify_uris = []
     tracks_not_added = []
     for item in tidal_playlist_items:
@@ -246,7 +248,14 @@ def main():
                   },
                   data=json.dumps(spotify_uris))
 
-    # TODO: Print completed status with number of tracks added and contents of tracks_not_added
+    # Print completed status with number of tracks added and contents of tracks_not_added
+    print(f'Successfully added {len(spotify_uris)} track(s) to Spotify playlist \'{spotify_playlist_name}\'.')
+    print(f'{len(tracks_not_added)} track(s) could not be found on Spotify.')
+    if len(tracks_not_added) > 0:
+        print('TIDAL tracks not found on Spotify:')
+        for track in tracks_not_added:
+            print('    ' + track.name + ' by ' + track.artist.name)
+
     # Open Spotify playlist in web browser
     webbrowser.open(spotify_playlist['external_urls']['spotify'])
 
