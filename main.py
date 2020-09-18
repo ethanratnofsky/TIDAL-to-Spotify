@@ -2,7 +2,7 @@ import json
 import os
 import time
 import webbrowser
-from urllib.parse import urlparse, parse_qs, quote
+from urllib.parse import urlparse, parse_qs
 
 import requests
 import tidalapi
@@ -211,19 +211,19 @@ def main():
             i += 1
 
     # Create new Spotify playlist as inputted name.
-    # print(f'Creating a new Spotify playlist named \'{spotify_playlist_name}\'...')
-    # payload = {
-    #     'name': spotify_playlist_name,
-    #     'public': True,
-    #     'collaborative': False,
-    #     'description': tidal_playlist.description
-    # }
-    # spotify_playlist = requests.post(f'https://api.spotify.com/v1/users/{spotify_user_id}/playlists',
-    #                                  headers={
-    #                                      'Authorization': 'Bearer ' + access_token,
-    #                                      'Content-Type': 'application/json'
-    #                                  },
-    #                                  data=json.dumps(payload)).json()
+    print(f'Creating a new Spotify playlist named \'{spotify_playlist_name}\'...')
+    payload = {
+        'name': spotify_playlist_name,
+        'public': True,
+        'collaborative': False,
+        'description': tidal_playlist.description
+    }
+    spotify_playlist = requests.post(f'https://api.spotify.com/v1/users/{spotify_user_id}/playlists',
+                                     headers={
+                                         'Authorization': 'Bearer ' + access_token,
+                                         'Content-Type': 'application/json'
+                                     },
+                                     data=json.dumps(payload)).json()
 
     # Iterate through TIDAL playlist tracks. For each track, search Spotify for track title and artist.
     spotify_uris = []
@@ -237,11 +237,18 @@ def main():
             # If not, add TIDAL track to tracks_not_added.
             tracks_not_added.append(item.name + ' by ' + item.artist.name)
 
-    # TODO: Add Spotify tracks from spotify_uris to Spotify playlist
+    # Add Spotify tracks from spotify_uris to Spotify playlist
+    requests.post(f"https://api.spotify.com/v1/playlists/{spotify_playlist['id']}/tracks",
+                  headers=
+                  {
+                      'Authorization': 'Bearer ' + access_token,
+                      'Content-Type': 'application/json'
+                  },
+                  data=json.dumps(spotify_uris))
 
     # TODO: Print completed status with number of tracks added and contents of tracks_not_added
     # Open Spotify playlist in web browser
-    # webbrowser.open(spotify_playlist['external_urls']['spotify'])
+    webbrowser.open(spotify_playlist['external_urls']['spotify'])
 
 
 if __name__ == '__main__':
