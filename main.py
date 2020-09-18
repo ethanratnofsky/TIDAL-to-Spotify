@@ -225,15 +225,17 @@ def main():
     #                                  },
     #                                  data=json.dumps(payload)).json()
 
-    # TODO: Iterate through TIDAL playlist tracks.
-    # TODO: For each track, search Spotify for track title and artist.
-    # TODO: If Spotify track found, add Spotify URI to spotify_uris. If not, add TIDAL track to tracks_not_added.
+    # Iterate through TIDAL playlist tracks. For each track, search Spotify for track title and artist.
+    spotify_uris = []
+    tracks_not_added = []
     for item in tidal_playlist_items:
         try:
+            # If Spotify track found, add Spotify URI to spotify_uris.
             results = search_spotify(item.name + ' ' + item.artist.name)
-            print(item.name + ' by ' + item.artist.name, '--->', results['tracks']['items'][0]['uri'])
+            spotify_uris.append(results['tracks']['items'][0]['uri'])
         except IndexError:
-            print(item.name + ' by ' + item.artist.name, '---> NO RESULTS')
+            # If not, add TIDAL track to tracks_not_added.
+            tracks_not_added.append(item.name + ' by ' + item.artist.name)
 
     # TODO: Add Spotify tracks from spotify_uris to Spotify playlist
 
