@@ -2,7 +2,7 @@ import json
 import os
 import time
 import webbrowser
-from urllib.parse import urlparse, parse_qs, quote_plus
+from urllib.parse import urlparse, parse_qs, quote
 
 import requests
 import tidalapi
@@ -148,12 +148,13 @@ def search_spotify(query):
                                'Authorization': 'Bearer ' + access_token
                            },
                            params={
-                               # TODO: urllib is not handling special characters well when encoding strings
-                               'q': quote_plus(query),
+                               # TODO: something is wrong with URL query encoding
+                               'q': query,
                                'type': 'track',
+                               'offset': 0,
                                'limit': 1
                            }).json()
-    return results['tracks']['items']
+    return results
 
 
 def main():
@@ -230,7 +231,7 @@ def main():
     for item in tidal_playlist_items:
         try:
             results = search_spotify(item.name + ' ' + item.artist.name)
-            print(item.name + ' by ' + item.artist.name, '--->', results[0]['name'] + ' by ' + results[0]['artists'][0]['name'])
+            print(item.name + ' by ' + item.artist.name, '--->', results['tracks']['items'][0]['uri'])
         except IndexError:
             print(item.name + ' by ' + item.artist.name, '---> NO RESULTS')
 
