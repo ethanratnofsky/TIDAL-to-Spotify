@@ -129,7 +129,7 @@ def print_tidal_playlist(playlist, items):
     print('Number of Tracks:', playlist.num_tracks)
     print('Contents:')
     for item in items:
-        print('    ' + item.name, '-', item.artist.name)
+        print('    ' + item.name + ' by ' + item.artist.name)
 
 
 def get_users_spotify_playlists():
