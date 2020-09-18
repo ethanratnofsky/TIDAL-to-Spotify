@@ -286,7 +286,7 @@ def main():
     if len(tracks_not_added) > 0:
         print('TIDAL tracks not found on Spotify:')
         for track in tracks_not_added:
-            print('    ' + track.name + ' by ' + track.artist.name)
+            print('    ' + track)
 
     # Open Spotify playlist in web browser
     webbrowser.open(spotify_playlist['external_urls']['spotify'])
