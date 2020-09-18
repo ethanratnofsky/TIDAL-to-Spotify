@@ -266,7 +266,15 @@ def main():
     for item in tidal_playlist_items:
         try:
             # If Spotify track found, add Spotify URI to spotify_uris.
-            results = search_spotify(item.name + ' ' + item.artist.name)
+            item_name = item.name
+            # Remove part of track name with '(feat. ...)' or '[feat. ...]' - can break Spotify search functionality
+            if ' (feat. ' in item_name:
+                item_name = item_name[:item_name.find(' (feat. ')] + item_name[item_name.find(')', item_name.find(
+                    ' (feat. ')) + 1:]
+            elif ' [feat. ' in item_name:
+                item_name = item_name[:item_name.find(' [feat. ')] + item_name[item_name.find(']', item_name.find(
+                    ' [feat. ')) + 1:]
+            results = search_spotify(item_name + ' ' + item.artist.name)
             spotify_uris.append(results['tracks']['items'][0]['uri'])
         except IndexError:
             # If not, add TIDAL track to tracks_not_added.
