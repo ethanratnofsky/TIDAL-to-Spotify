@@ -23,11 +23,17 @@ access_token = ''
 
 
 def print_hdiv():
+    """Print a horizontal divider."""
     print('-----------------------------------')
 
 
 def refresh_token():
-    # Refresh access token
+    """Refresh access token for Spotify API
+
+    Returns:
+        token: dict
+            JSON object which holds access/refresh token information for Spotify API
+    """
     token = requests.post('https://accounts.spotify.com/api/token',
                           data={'grant_type': 'refresh_token',
                                 'refresh_token': REFRESH_TOKEN,
@@ -37,7 +43,12 @@ def refresh_token():
 
 
 def request_token():
-    # Request user authentication
+    """Request access token for Spotify API
+
+    Returns:
+        token:
+            JSON object which holds access/refresh token information for Spotify API
+    """
     code_response = requests.get('https://accounts.spotify.com/authorize',
                                  params={'client_id': CLIENT_ID,
                                          'response_type': 'code',
@@ -79,6 +90,12 @@ def request_token():
 
 
 def auth_spotify():
+    """Authenticate access to Spotify user information
+
+    Returns:
+        user_id: str
+            A string that represents the Spotify ID for the user
+    """
     # If REFRESH_TOKEN exists, user wanted to be remembered from last session, so refresh access token
     print('Recognizing Spotify user...')
     if REFRESH_TOKEN:
@@ -118,6 +135,7 @@ def auth_spotify():
 
 
 def print_tidal_playlist(playlist, items):
+    """Prints TIDAL playlist information."""
     print('Playlist ID:', playlist.id)
     print('Title:', playlist.name)
     print('Description:', playlist.description)
@@ -133,6 +151,12 @@ def print_tidal_playlist(playlist, items):
 
 
 def get_users_spotify_playlists():
+    """Gets list of user's Spotify playlists.
+
+    Returns:
+        playlists: array
+            A list of the playlist names under the user's Spotify account
+    """
     spotify_playlists = requests.get('https://api.spotify.com/v1/me/playlists',
                                      headers={'Authorization': 'Bearer ' + access_token}).json()
     playlists = []
@@ -143,12 +167,21 @@ def get_users_spotify_playlists():
 
 
 def search_spotify(query):
+    """Searches Spotify for specified track.
+
+    Parameters:
+        query: str
+            A string that represents the query parameter for Spotify's search API endpoint
+
+    Returns:
+        results: dict
+            JSON object that represents Spotify search results
+    """
     results = requests.get('https://api.spotify.com/v1/search',
                            headers={
                                'Authorization': 'Bearer ' + access_token
                            },
                            params={
-                               # TODO: something is wrong with URL query encoding
                                'q': query,
                                'type': 'track',
                                'offset': 0,
