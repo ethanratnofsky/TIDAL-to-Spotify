@@ -274,8 +274,7 @@ def main():
 
     # Add Spotify tracks from spotify_uris to Spotify playlist
     requests.post(f"https://api.spotify.com/v1/playlists/{spotify_playlist['id']}/tracks",
-                  headers=
-                  {
+                  headers={
                       'Authorization': 'Bearer ' + access_token,
                       'Content-Type': 'application/json'
                   },
